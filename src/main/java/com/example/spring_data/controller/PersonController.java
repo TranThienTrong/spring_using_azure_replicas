@@ -1,8 +1,9 @@
 package com.example.spring_data.controller;
 
 import com.example.spring_data.model.Person;
-import com.example.spring_data.repository.PersonRepository;
+import com.example.spring_data.repository.primary.PrimaryPersonRepository;
 
+import com.example.spring_data.repository.secondary.SecondaryPersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +18,18 @@ import java.util.Optional;
 @RequestMapping("/")
 public class PersonController {
     @Autowired
-    PersonRepository personRepository;
+    PrimaryPersonRepository primaryPersonRepository;
+
+    @Autowired
+    SecondaryPersonRepository secondaryPersonRepository;
 
 
     @GetMapping("/persons")
     public ResponseEntity<List<Person>> getAllPersons(@RequestParam(required = false) String name) {
         try {
-            List<Person> personList = new ArrayList<Person>();
+            List<Person> personList = new ArrayList<>();
 
-            personList.addAll(personRepository.findAll());
+            personList.addAll(secondaryPersonRepository.findAll());
 
             if (personList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -39,7 +43,7 @@ public class PersonController {
 
     @GetMapping("/person/{id}")
     public ResponseEntity<Person> getPersonById(@PathVariable("id") Long id) {
-        Optional<Person> personData =personRepository.findById(id);
+        Optional<Person> personData = primaryPersonRepository.findById(id);
 
         if (personData.isPresent()) {
             return new ResponseEntity<>(personData.get(), HttpStatus.OK);
@@ -53,7 +57,7 @@ public class PersonController {
         try {
             Person _person = new Person(person.getId(),person.getName());
 
-            personRepository.save(_person);
+            primaryPersonRepository.save(_person);
             return new ResponseEntity<>(_person, HttpStatus.CREATED);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -63,12 +67,12 @@ public class PersonController {
 
     @PutMapping("/person/{id}")
     public ResponseEntity<Person> updatePerson(@PathVariable("id") Long id, @RequestBody Person person) {
-        Optional<Person> personData = personRepository.findById(id);
+        Optional<Person> personData = primaryPersonRepository.findById(id);
 
         if (personData.isPresent()) {
             Person _person = personData.get();
             _person.setName(_person.getName());
-            return new ResponseEntity<>(personRepository.save(_person), HttpStatus.OK);
+            return new ResponseEntity<>(primaryPersonRepository.save(_person), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -77,7 +81,7 @@ public class PersonController {
     @DeleteMapping("/person/{id}")
     public ResponseEntity<HttpStatus> deletePerson(@PathVariable("id") Long id) {
         try {
-            personRepository.deleteById(id);
+            primaryPersonRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,7 +91,7 @@ public class PersonController {
     @DeleteMapping("/persons")
     public ResponseEntity<HttpStatus> deleteAllPersons() {
         try {
-            personRepository.deleteAll();
+            primaryPersonRepository.deleteAll();
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
