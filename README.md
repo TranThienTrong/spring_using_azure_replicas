@@ -1,7 +1,7 @@
 # spring_using_azure_replicas
 In this project, I implement Master-Slave or Primary-Replicas Model into Spring Boot. In this model, all writes and updates happen in master Database; whereas, read operations are distributed across replicas database. This model improves  performance because it allows more queries to be processed in parallel.
 
-![Replica](https://user-images.githubusercontent.com/36349293/193421538-24ba9f66-44a9-4361-89d5-9e6587e2666e.jpeg)
+![Untitled](https://user-images.githubusercontent.com/36349293/193509821-818d01c5-3195-43d8-af7a-991df906ed61.jpeg)
 
 
 ### 1. Please follow this guide to create your Azure Database and it's replicas:
